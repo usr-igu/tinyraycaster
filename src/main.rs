@@ -14,6 +14,10 @@ impl Color {
         Color { r, g, b, a }
     }
 
+    fn rgb(r: u8, g: u8, b: u8) -> Color {
+        Color { r, g, b, a: 255 }
+    }
+
     fn to_u32(&self) -> u32 {
         ((self.a << 24) + (self.b << 16) + (self.g << 8) + self.r) as u32
     }
@@ -27,15 +31,36 @@ impl Color {
     }
 }
 
-fn write_ppm_image(filename: &str, image: &Vec<Color>, w: usize, h: usize) {
-    assert_eq!(image.len(), w * h);
+fn write_ppm_image(filename: &str, pixel_data: &Vec<Color>, w: usize, h: usize) {
+    assert_eq!(pixel_data.len(), w * h);
     let mut file = File::create(filename).expect("erro ao tentar criar o arquivo ppm");
     let ppm_header = format!("P6\n{} {}\n255\n", w, h);
     file.write_all(ppm_header.as_bytes())
         .expect("erro ao tentar escrever o header ppm");
     for i in 0..w * h {
-        file.write(&[image[i].r, image[i].g, image[i].b])
+        file.write(&[pixel_data[i].r, pixel_data[i].g, pixel_data[i].b])
             .expect("erro ao tentar escrever os bytes da imagem");
+    }
+}
+
+fn draw_rect(
+    image_data: &mut Vec<Color>,
+    image_w: usize,
+    image_h: usize,
+    x: usize,
+    y: usize,
+    w: usize,
+    h: usize,
+    c: Color,
+) {
+    assert_eq!(image_data.len(), image_h * image_w);
+    for i in 0..w {
+        for j in 0..h {
+            let cx = x + i;
+            let cy = y + j;
+            assert!(cx < image_w && cy < image_h);
+            image_data[cx + cy * image_w] = c;
+        }
     }
 }
 
@@ -43,16 +68,61 @@ fn main() {
     const WIDTH: usize = 512;
     const HEIGHT: usize = 512;
 
-    let mut image_data = vec![Color::from_u32(0); WIDTH * HEIGHT];
+    let mut pixel_data = vec![Color::from_u32(0); WIDTH * HEIGHT];
 
-    for j in 0..H {
-        for i in 0..W {
-            let r = (255.0 * j as f32 / H as f32) as u8;
-            let g = (255.0 * i as f32 / W as f32) as u8;
+    const MAP_W: usize = 16;
+    const MAP_H: usize = 16;
+
+    const MAP: &[u8] = b"0000222222220000\
+                        1              0\
+                        1      11111   0\
+                        1     0        0\
+                        0     0  1110000\
+                        0     3        0\
+                        0   10000      0\
+                        0   0   11100  0\
+                        0   0   0      0\
+                        0   0   1  00000\
+                        0       1      0\
+                        2       1      0\
+                        0       0      0\
+                        0 0000000      0\
+                        0              0\
+                        0002222222200000";
+
+    assert_eq!(MAP.len(), MAP_W * MAP_H);
+
+    for j in 0..HEIGHT {
+        for i in 0..WIDTH {
+            let r = (255.0 * j as f32 / HEIGHT as f32) as u8;
+            let g = (255.0 * i as f32 / WIDTH as f32) as u8;
             let b = 0u8;
-            image_data[i + j * W] = Color::new(r, g, b, 255);
+            pixel_data[i + j * WIDTH] = Color::rgb(r, g, b);
         }
     }
 
-    write_ppm_image("framebuffer.ppm", &image_data, WIDTH, HEIGHT);
+    let rect_h = HEIGHT / MAP_H;
+    let rect_w = WIDTH / MAP_W;
+
+    for j in 0..MAP_H {
+        for i in 0..MAP_W {
+            if MAP[i + j * MAP_W] == b' ' {
+                continue;
+            }
+            let rect_x = i * rect_w;
+            let rect_y = j * rect_h;
+            draw_rect(
+                &mut pixel_data,
+                WIDTH,
+                HEIGHT,
+                rect_x,
+                rect_y,
+                rect_w,
+                rect_h,
+                Color::rgb(0, 255, 255),
+            );
+        }
+    }
+
+    write_ppm_image("framebuffer.ppm", &pixel_data, WIDTH, HEIGHT);
 }
