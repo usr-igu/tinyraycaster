@@ -5,11 +5,12 @@ use std::io::Write;
 struct Player {
     x: f32,
     y: f32,
+    dir: f32,
 }
 
 impl Player {
-    fn new(x: f32, y: f32) -> Player {
-        Player { x, y }
+    fn new(x: f32, y: f32, dir: f32) -> Player {
+        Player { x, y, dir }
     }
 }
 
@@ -136,7 +137,7 @@ fn main() {
         }
     }
 
-    let player = Player::new(3.456, 2.345);
+    let player = Player::new(3.456, 2.345, 1.523);
 
     draw_rect(
         &mut pixel_data,
@@ -148,6 +149,19 @@ fn main() {
         5,
         Color::rgb(255, 255, 255),
     );
+
+    let mut t = 0.0;
+    while t < 20.0 {
+        let cx = player.x + t * player.dir.cos();
+        let cy = player.y + t * player.dir.sin();
+        if (MAP[cx.floor() as usize + cy.floor() as usize * MAP_W] != b' ') {
+            break;
+        }
+        let pix_x = cx * rect_w as f32;
+        let pix_y = cy * rect_h as f32;
+        pixel_data[pix_x as usize + pix_y as usize * WIDTH] = Color::rgb(255, 255, 255);
+        t = t + 0.05;
+    }
 
     write_ppm_image("framebuffer.ppm", &pixel_data, WIDTH, HEIGHT);
 }
