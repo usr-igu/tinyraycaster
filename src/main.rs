@@ -2,6 +2,18 @@ use std::fs::File;
 use std::io::Write;
 
 #[derive(Debug, Copy, Clone)]
+struct Player {
+    x: f32,
+    y: f32,
+}
+
+impl Player {
+    fn new(x: f32, y: f32) -> Player {
+        Player { x, y }
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
 struct Color {
     r: u8,
     g: u8,
@@ -123,6 +135,19 @@ fn main() {
             );
         }
     }
+
+    let player = Player::new(3.456, 2.345);
+
+    draw_rect(
+        &mut pixel_data,
+        WIDTH,
+        HEIGHT,
+        (player.x * rect_w as f32) as usize,
+        (player.y * rect_h as f32) as usize,
+        5,
+        5,
+        Color::rgb(255, 255, 255),
+    );
 
     write_ppm_image("framebuffer.ppm", &pixel_data, WIDTH, HEIGHT);
 }
