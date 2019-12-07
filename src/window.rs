@@ -46,18 +46,7 @@ impl Window {
         }
     }
 
-    /// Grava o buffer de pixels em um arquivo ppm.
-    pub fn write_ppm_image(&self, filename: &str) {
-        let mut file = File::create(filename).expect("erro ao tentar criar o arquivo ppm");
-        let ppm_header = format!("P6\n{} {}\n255\n", self.width, self.height);
-        file.write_all(ppm_header.as_bytes())
-            .expect("erro ao tentar escrever o header ppm");
-        for i in 0..self.width * self.height {
-            file.write_all(&[self.pixels[i].r(), self.pixels[i].g(), self.pixels[i].b()])
-                .expect("erro ao tentar escrever os bytes da imagem");
-        }
-    }
-
+    /// Grava o buffer de pixels em um arquivo png.
     pub fn write_png_image(&self, filename: &str) {
         let mut file = File::create(filename).expect("erro ao tentar criar o arquivo png");
         let encoder = image::png::PNGEncoder::new(file);
@@ -69,7 +58,7 @@ impl Window {
             bytes.push(pixels.b());
         }
 
-        let _ = encoder
+        encoder
             .encode(
                 bytes.by_ref(),
                 self.width as u32,

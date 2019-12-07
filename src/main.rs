@@ -9,11 +9,11 @@ fn main() {
     let mut window = Window::default();
 
     let colors = vec![
-        Color::from_rgb(207, 180, 236),
-        Color::from_rgb(37, 0, 86),
-        Color::from_rgb(49, 71, 118),
-        Color::from_rgb(0, 10, 60),
-        Color::from_rgb(178, 191, 197),
+        Color::from_rgb(15, 76, 129),
+        Color::from_rgb(141, 0, 69),
+        Color::from_rgb(214, 165, 0),
+        Color::from_rgb(0, 141, 155),
+        Color::from_rgb(221, 167, 155),
     ];
 
     const MAP_W: usize = 16;
@@ -40,7 +40,7 @@ fn main() {
 
     let mut player = Player::new(3.456, 2.345, std::f32::consts::FRAC_PI_4);
 
-    for frame in 0..3 {
+    for frame in 0..360 {
         // Desenha o fundo
         for j in 0..window.height {
             for i in 0..window.width {
@@ -80,7 +80,8 @@ fn main() {
                 window.set_pixel(pix_x, pix_y, Color::from_rgb(160, 160, 160));
 
                 if MAP[cx as usize + cy as usize * MAP_W] != b' ' {
-                    let column_height = (window.height as f32 / distance) as usize;
+                    let column_height =
+                        (window.height as f32 / (distance * (angle - player.dir).cos())) as usize;
                     let column_x = window.width / 2 + i;
                     let column_y = window.height / 2 - column_height / 2;
                     let color = MAP[cx as usize + cy as usize * MAP_W] - b'0';
@@ -88,10 +89,10 @@ fn main() {
                     window.draw_rect(column_x, column_y, 1, column_height, colors[color as usize]);
                     break;
                 }
-                distance += 0.10;
+                distance += 0.01;
             }
         }
         player.dir += 2.0 * std::f32::consts::PI / 360.0;
-        window.write_png_image(&format!("framebuffer_{}.png", frame));
+        window.write_png_image(&format!("output/framebuffer_{}.png", frame));
     }
 }

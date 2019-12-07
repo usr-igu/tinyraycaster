@@ -31,18 +31,6 @@ impl Color {
         Color::new(r, g, b, 255)
     }
 
-    pub fn red() -> Color {
-        Color::from_rgb(255, 0, 0)
-    }
-
-    pub fn green() -> Color {
-        Color::from_rgb(0, 255, 0)
-    }
-
-    pub fn blue() -> Color {
-        Color::from_rgb(0, 0, 255)
-    }
-
     pub fn white() -> Color {
         Color::from_rgb(255, 255, 255)
     }
