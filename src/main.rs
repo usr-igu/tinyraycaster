@@ -55,7 +55,7 @@ fn main() {
         }
     }
 
-    let player = Player::new(3.456, 2.345, 1.523);
+    let player = Player::new(3.456, 2.345, std::f32::consts::FRAC_PI_2);
 
     // Desenha o jogador
     window.set_pixel(
@@ -64,18 +64,22 @@ fn main() {
         Color::white(),
     );
 
-    // Desenha a reta que mostra pra onde o player esta olhando
-    let mut t = 0.0;
-    while t < 20.0 {
-        let cx = player.x + t * player.dir.cos();
-        let cy = player.y + t * player.dir.sin();
-        if MAP[cx.floor() as usize + cy.floor() as usize * MAP_W] != b' ' {
-            break;
+    // Desenha a field of view do player
+    let fov = std::f32::consts::FRAC_PI_3;
+    for i in 0..window.width {
+        let angle = player.dir - fov / 2.0 + fov * i as f32 / window.width as f32;
+        let mut distance = 0.0;
+        while distance < 10.0 {
+            let cx = player.x + distance * angle.cos();
+            let cy = player.y + distance * angle.sin();
+            if MAP[cx.floor() as usize + cy.floor() as usize * MAP_W] != b' ' {
+                break;
+            }
+            let pix_x = cx * rect_w as f32;
+            let pix_y = cy * rect_h as f32;
+            window.set_pixel(pix_x as usize, pix_y as usize, Color::white());
+            distance = distance + 0.05;
         }
-        let pix_x = cx * rect_w as f32;
-        let pix_y = cy * rect_h as f32;
-        window.set_pixel(pix_x as usize, pix_y as usize, Color::white());
-        t = t + 0.05;
     }
 
     window.write_ppm_image("framebuffer.ppm");
