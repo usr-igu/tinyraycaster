@@ -40,13 +40,9 @@ fn main() {
 
     let mut player = Player::new(3.456, 2.345, std::f32::consts::FRAC_PI_4);
 
-    for frame in 0..180 {
+    for frame in 0..360 {
         // Desenha o fundo
-        for j in 0..window.height {
-            for i in 0..window.width {
-                window.set_pixel(i, j, Color::white())
-            }
-        }
+        window.clear(Color::white());
 
         // Desenha o mapa
         let rect_w = window.width / (MAP_W * 2);
@@ -67,7 +63,7 @@ fn main() {
         let fov = std::f32::consts::FRAC_PI_3;
 
         for i in 0..window.width / 2 {
-            let angle = player.dir - (fov / 2.0) + (fov * i as f32) / (window.width as f32 / 2.0);
+            let angle = player.angle - (fov / 2.0) + (fov * i as f32) / (window.width as f32 / 2.0);
             let mut distance = 0.0;
             while distance < 20.0 {
                 let cx = player.x + distance * angle.cos();
@@ -81,18 +77,34 @@ fn main() {
 
                 if MAP[cx as usize + cy as usize * MAP_W] != b' ' {
                     let column_height =
-                        (window.height as f32 / (distance * (angle - player.dir).cos())) as usize;
+                        (window.height as f32 / (distance * (angle - player.angle).cos())) as usize;
                     let column_x = window.width / 2 + i;
                     let column_y = window.height / 2 - column_height / 2;
                     let color = MAP[cx as usize + cy as usize * MAP_W] - b'0';
+                    // Desenha o céu
+                    window.draw_rect(
+                        column_x,
+                        0,
+                        1,
+                        window.height - column_height,
+                        Color::from_rgb(0, 238, 238),
+                    );
                     // Desenha a visão pseudo-3D
                     window.draw_rect(column_x, column_y, 1, column_height, colors[color as usize]);
+                    // Desenha o chão
+                    window.draw_rect(
+                        column_x,
+                        column_y + column_height,
+                        1,
+                        window.height - column_height,
+                        Color::from_rgb(120, 120, 120),
+                    );
                     break;
                 }
                 distance += 0.01;
             }
         }
-        player.dir += 2.0 * std::f32::consts::PI / 360.0;
+        player.angle += 2.0 * std::f32::consts::PI / 360.0;
         window.write_png_image(&format!("output/framebuffer_{}.png", frame));
     }
 }

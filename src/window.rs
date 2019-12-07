@@ -53,7 +53,7 @@ impl Window {
         let mut bytes = Vec::with_capacity(self.width * self.height);
 
         for pixels in &self.pixels {
-            bytes.extend(pixels.as_ref());
+            bytes.extend(&[pixels.r(), pixels.g(), pixels.b(), pixels.a()]);
         }
 
         encoder
