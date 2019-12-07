@@ -23,6 +23,10 @@ impl Color {
         return self.b;
     }
 
+    pub fn a(&self) -> u8 {
+        return self.a;
+    }
+
     pub fn from_rgb(r: u8, g: u8, b: u8) -> Color {
         Color::new(r, g, b, 255)
     }

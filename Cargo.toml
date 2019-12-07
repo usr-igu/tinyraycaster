@@ -8,6 +8,7 @@ edition = "2018"
 
 [profile.release]
 codegen-units = 1
-lto = true
+debug = true
 
 [dependencies]
+image = {version = "0.23.0-preview.0", default-features = false, features = ["png_codec"]}

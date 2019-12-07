@@ -57,6 +57,33 @@ impl Window {
                 .expect("erro ao tentar escrever os bytes da imagem");
         }
     }
+
+    pub fn write_png_image(&self, filename: &str) {
+        let mut file = File::create(filename).expect("erro ao tentar criar o arquivo png");
+        let encoder = image::png::PNGEncoder::new(file);
+        let mut bytes = Vec::with_capacity(self.width * self.height);
+
+        for pixels in &self.pixels {
+            bytes.push(pixels.r());
+            bytes.push(pixels.g());
+            bytes.push(pixels.b());
+        }
+
+        let _ = encoder
+            .encode(
+                bytes.by_ref(),
+                self.width as u32,
+                self.height as u32,
+                image::ColorType::Rgb8,
+            )
+            .expect("erro ao criar arquivo png");
+    }
+
+    pub fn clear(&mut self, color: Color) {
+        for pixel in &mut self.pixels {
+            *pixel = color;
+        }
+    }
 }
 
 impl Default for Window {
