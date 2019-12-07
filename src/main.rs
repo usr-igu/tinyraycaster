@@ -78,7 +78,7 @@ fn main() {
             let pix_x = cx * rect_w as f32;
             let pix_y = cy * rect_h as f32;
             window.set_pixel(pix_x as usize, pix_y as usize, Color::white());
-            distance = distance + 0.05;
+            distance += 0.05;
         }
     }
 

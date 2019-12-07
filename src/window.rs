@@ -51,7 +51,7 @@ impl Window {
         file.write_all(ppm_header.as_bytes())
             .expect("erro ao tentar escrever o header ppm");
         for i in 0..self.width * self.height {
-            file.write(&[self.pixels[i].r(), self.pixels[i].g(), self.pixels[i].b()])
+            file.write_all(&[self.pixels[i].r(), self.pixels[i].g(), self.pixels[i].b()])
                 .expect("erro ao tentar escrever os bytes da imagem");
         }
     }
