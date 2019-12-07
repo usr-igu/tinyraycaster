@@ -6,6 +6,12 @@ pub struct Color {
     a: u8,
 }
 
+impl AsRef<[&u8]> for Color {
+    fn as_ref(&self) -> &[&u8] {
+        &[&self.r, &self.g, &self.b, &self.a]
+    }
+}
+
 impl Color {
     pub fn new(r: u8, g: u8, b: u8, a: u8) -> Color {
         Color { r, g, b, a }

@@ -40,7 +40,7 @@ fn main() {
 
     let mut player = Player::new(3.456, 2.345, std::f32::consts::FRAC_PI_4);
 
-    for frame in 0..360 {
+    for frame in 0..180 {
         // Desenha o fundo
         for j in 0..window.height {
             for i in 0..window.width {

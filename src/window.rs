@@ -48,14 +48,12 @@ impl Window {
 
     /// Grava o buffer de pixels em um arquivo png.
     pub fn write_png_image(&self, filename: &str) {
-        let mut file = File::create(filename).expect("erro ao tentar criar o arquivo png");
+        let file = File::create(filename).expect("erro ao tentar criar o arquivo png");
         let encoder = image::png::PNGEncoder::new(file);
         let mut bytes = Vec::with_capacity(self.width * self.height);
 
         for pixels in &self.pixels {
-            bytes.push(pixels.r());
-            bytes.push(pixels.g());
-            bytes.push(pixels.b());
+            bytes.extend(pixels.as_ref());
         }
 
         encoder
@@ -63,7 +61,7 @@ impl Window {
                 bytes.by_ref(),
                 self.width as u32,
                 self.height as u32,
-                image::ColorType::Rgb8,
+                image::ColorType::Rgba8,
             )
             .expect("erro ao criar arquivo png");
     }
