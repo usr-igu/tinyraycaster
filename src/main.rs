@@ -33,16 +33,13 @@ fn main() {
     // Desenha o fundo
     for j in 0..window.height {
         for i in 0..window.width {
-            let r = (255.0 * j as f32 / window.height as f32) as u8;
-            let g = (255.0 * i as f32 / window.width as f32) as u8;
-            let b = 0u8;
-            window.set_pixel(i, j, Color::from_rgb(r, g, b))
+            window.set_pixel(i, j, Color::white())
         }
     }
 
     // Desenha o mapa
+    let rect_w = window.width / (MAP_W * 2);
     let rect_h = window.height / MAP_H;
-    let rect_w = window.width / MAP_W;
 
     for j in 0..MAP_H {
         for i in 0..MAP_W {
@@ -51,7 +48,13 @@ fn main() {
             }
             let rect_x = i * rect_w;
             let rect_y = j * rect_h;
-            window.draw_rect(rect_x, rect_y, rect_w, rect_h, Color::from_rgb(0, 255, 255));
+            window.draw_rect(
+                rect_x,
+                rect_y,
+                rect_w,
+                rect_h,
+                Color::from_rgb(50, 200, 200),
+            );
         }
     }
 
@@ -61,23 +64,38 @@ fn main() {
     window.set_pixel(
         (player.x * rect_w as f32) as usize,
         (player.y * rect_h as f32) as usize,
-        Color::white(),
+        Color::red(),
     );
 
-    // Desenha a field of view do player
     let fov = std::f32::consts::FRAC_PI_3;
-    for i in 0..window.width {
-        let angle = player.dir - fov / 2.0 + fov * i as f32 / window.width as f32;
+
+    for i in 0..window.width / 2 {
+        let angle = player.dir - (fov / 2.0) + (fov * i as f32) / (window.width as f32 / 2.0);
         let mut distance = 0.0;
-        while distance < 10.0 {
+        while distance < 20.0 {
             let cx = player.x + distance * angle.cos();
             let cy = player.y + distance * angle.sin();
-            if MAP[cx.floor() as usize + cy.floor() as usize * MAP_W] != b' ' {
+
+            let pix_x = (cx * rect_w as f32) as usize;
+            let pix_y = (cy * rect_h as f32) as usize;
+
+            // Desenha cone FOV
+            window.set_pixel(pix_x, pix_y, Color::from_rgb(160, 160, 160));
+
+            if MAP[cx as usize + cy as usize * MAP_W] != b' ' {
+                let column_height = (window.height as f32 / distance) as usize;
+                let column_x = window.width / 2 + i;
+                let column_y = window.height / 2 - column_height / 2;
+                // Desenha a visão pseudo-3D
+                window.draw_rect(
+                    column_x,
+                    column_y,
+                    1,
+                    column_height,
+                    Color::from_rgb(50, 200, 200),
+                );
                 break;
             }
-            let pix_x = cx * rect_w as f32;
-            let pix_y = cy * rect_h as f32;
-            window.set_pixel(pix_x as usize, pix_y as usize, Color::white());
             distance += 0.05;
         }
     }

@@ -38,7 +38,9 @@ impl Window {
             for j in 0..rect_height {
                 let cx = x + i;
                 let cy = y + j;
-                assert!(cx < self.width && cy < self.height);
+                if cx >= self.width || cy >= self.height {
+                    continue;
+                };
                 self.set_pixel(cx, cy, color);
             }
         }
@@ -59,6 +61,6 @@ impl Window {
 
 impl Default for Window {
     fn default() -> Self {
-        Window::new(512, 512, vec![Color::black(); 512 * 512])
+        Window::new(1024, 512, vec![Color::black(); 1024 * 512])
     }
 }
