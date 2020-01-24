@@ -10,4 +10,4 @@ edition = "2018"
 codegen-units = 1
 
 [dependencies]
-image = {version = "0.23.0-preview.0", default-features = false, features = ["png_codec"]}
+image = {version = "0.22.4", default-features = false, features = ["png_codec"]}
